@@ -11,14 +11,6 @@ import default_val as df
 @dataclass
 class BotConfig:
     @property
-    def state(self):
-        return self._state
-
-    @state.setter
-    def state(self, newVal):
-        self._state = newVal
-
-    @property
     def locale(self):
         return self._locale
 
@@ -51,10 +43,9 @@ class BotConfig:
             cursor = dbConnect.cursor()
             cursor.execute('''CREATE TABLE IF NOT EXISTS messages
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    chat_id INTEGER,
-                    message_id INTEGER,
-                    text TEXT,
-                    date INTEGER)''')
+                    from_id INTEGER,
+                    to_id INTEGER,
+                    text TEXT)''')
 
 
 def get_all_info(botInfo: User, msg: Message) -> dict[str, object]:

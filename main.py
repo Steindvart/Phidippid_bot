@@ -21,13 +21,14 @@ bot: Bot = Bot(botConfig.token, parse_mode="HTML")
 
 # Main
 if __name__ == '__main__':
-    dp: Dispatcher = Dispatcher()
+    dp: Dispatcher = Dispatcher(storage=storage)
 
     # Commands
     # TODO - move it to separate block
     dp.message.register(cmd.start, Command(commands=['start']))
     dp.message.register(cmd.cancel, Text(text=['Отмена'], ignore_case=True))
-    dp.message.register(cmd.set_messages, Command(commands=['setMessages']))
-    dp.message.register(cmd.set_message, StateFilter(BotStatesGroup.messages))
+    dp.message.register(cmd.set_message, Command(commands=['setMessage']))
+    dp.message.register(cmd.proc_message, StateFilter(BotStatesGroup.message))
+    dp.message.register(cmd.proc_reсipient, StateFilter(BotStatesGroup.recipient))
 
     dp.run_polling(bot)
