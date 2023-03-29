@@ -1,0 +1,10 @@
+# Folders
+.vs/
+venv/
+__pycache__/
+.vscode/
+tmp/
+
+# Files
+.env
+app.log
