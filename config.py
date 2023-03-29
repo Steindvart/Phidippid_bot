@@ -1,14 +1,23 @@
 import json
+import sqlite3
 # from typing import Any
 from dataclasses import dataclass
 
 from environs import Env
-
 from aiogram.types import User, Message
 
+import default_val as df
 
 @dataclass
 class BotConfig:
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, newVal):
+        self._state = newVal
+
     @property
     def locale(self):
         return self._locale
@@ -23,19 +32,29 @@ class BotConfig:
     def __init__(self) -> None:
         # TODO - find better way to define props
         # Data
+        self.state = "main"
         self.supportedLocales = ("ru")
         # self.resources: dict[str, Any]
 
         # NOTE - Default locale is "ru"
         # DEFECT - Get first locale from supported, no hard-code
         self.locale = "ru"
-
         env = Env()
         env.read_env()
         self.token: str = env("BOT_TOKEN")
 
         with open(f"locales/{self.locale}.json", "r", encoding="utf8") as file:
             self.resources = json.load(file)
+
+        # DB init
+        with sqlite3.connect(df.DB_PATH) as dbConnect:
+            cursor = dbConnect.cursor()
+            cursor.execute('''CREATE TABLE IF NOT EXISTS messages
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    chat_id INTEGER,
+                    message_id INTEGER,
+                    text TEXT,
+                    date INTEGER)''')
 
 
 def get_all_info(botInfo: User, msg: Message) -> dict[str, object]:
