@@ -8,6 +8,7 @@ from aiogram.types import User, Message
 
 import default_val as df
 
+
 @dataclass
 class BotConfig:
     @property
@@ -24,7 +25,6 @@ class BotConfig:
     def __init__(self) -> None:
         # TODO - find better way to define props
         # Data
-        self.state = "main"
         self.supportedLocales = ("ru")
         # self.resources: dict[str, Any]
 
@@ -41,11 +41,7 @@ class BotConfig:
         # DB init
         with sqlite3.connect(df.DB_PATH) as dbConnect:
             cursor = dbConnect.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS messages
-                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    from_id INTEGER,
-                    to_id INTEGER,
-                    text TEXT)''')
+            cursor.execute(df.DB_SCHEMA_MESSAGES)
 
 
 def get_all_info(botInfo: User, msg: Message) -> dict[str, object]:

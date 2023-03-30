@@ -1,14 +1,13 @@
 import logging
 import sqlite3
-from datetime import datetime
+import asyncio
 
-from aiogram import types
+from aiogram import types, exceptions
 from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
-from aiogram.utils import markdown
 from aiogram.fsm.context import FSMContext
 
 # DEFECT - using global objects, not good
-from main import botConfig
+from main import bot, botConfig
 from states import BotStatesGroup
 import config
 import default_val as df
@@ -18,8 +17,7 @@ res = botConfig.resources
 
 # Keyboards
 btn_cancel: KeyboardButton = KeyboardButton(text='Отмена')
-keyboard_cancel: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
-                                    resize_keyboard=True, keyboard=[[btn_cancel]])
+keyboard_cancel: ReplyKeyboardMarkup = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[btn_cancel]])
 
 
 async def start(message: types.Message) -> None:
@@ -38,6 +36,33 @@ async def cancel(message: types.Message, state: FSMContext) -> None:
 
     await state.clear()
     await message.answer(text='Состояние сброшено', reply_markup=ReplyKeyboardRemove())
+
+
+async def send_message_to_recipient(from_chat: types.message, recipient_id, text):
+    try:
+        await bot.send_message(chat_id=recipient_id, text=text)
+        await from_chat.answer(text=f'✅ Успех: сообщение отправлено получателю {recipient_id}.')
+    except exceptions.TelegramForbiddenError:
+        await from_chat.answer(text=f'❌ Неудача: получатель {recipient_id} не активировал или заблокировал бота.')
+    except exceptions.TelegramNotFound:
+        await from_chat.answer(text=f'❌ Неудача: получатель {recipient_id} не существует.')
+    except exceptions.TelegramRetryAfter as e:
+        # TODO - message about retry
+        await asyncio.sleep(e.retry_after)
+        await bot.send_message(chat_id=recipient_id, text=text)
+    except exceptions.TelegramAPIError:
+        await from_chat.answer(text=f'❌ Неудача: сообщение для {recipient_id} не отправлено.')
+
+
+async def send_messages(message: types.Message, state: FSMContext) -> None:
+    logging.info(config.get_log_str("send_messages", message.from_user))
+
+    with sqlite3.connect(df.DB_PATH) as conn:
+        cursor = conn.cursor()
+        user_id = message.from_user.id
+        cursor.execute(f'SELECT to_id, text FROM messages WHERE from_id = {user_id}')
+        for (recipient_id, text) in cursor.fetchall():
+            await send_message_to_recipient(message, recipient_id, text)
 
 
 async def set_message(message: types.Message, state: FSMContext) -> None:
@@ -74,3 +99,4 @@ async def proc_reсipient(message: types.Message, state: FSMContext) -> None:
         conn.commit()
 
     await state.clear()
+    await message.answer(text="✅ Сообщение добавлено", reply_markup=ReplyKeyboardRemove())
