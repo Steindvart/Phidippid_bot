@@ -10,7 +10,7 @@ from states import BotStatesGroup
 
 
 # Configure logging
-logging.basicConfig(filename='app.log', level=logging.INFO,
+logging.basicConfig(filename='data/app.log', level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(name)s - %(message)s')
 
 # Global obj

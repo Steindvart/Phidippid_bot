@@ -35,7 +35,7 @@ class BotConfig:
         env.read_env()
         self.token: str = env("BOT_TOKEN")
 
-        with open(f"locales/{self.locale}.json", "r", encoding="utf8") as file:
+        with open(f"../res/locales/{self.locale}.json", "r", encoding="utf8") as file:
             self.resources = json.load(file)
 
         # DB init
