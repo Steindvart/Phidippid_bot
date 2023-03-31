@@ -1,42 +1,18 @@
-import json
-import sqlite3
-from dataclasses import dataclass
-from environs import Env
+from aiogram import Dispatcher
+from aiogram.filters import Command, Text, StateFilter
 
-import default_val as df
+import commands as cmd
+from states import BotStatesGroup
 
-@dataclass
-class BotConfig:
-    @property
-    def locale(self):
-        return self._locale
 
-    @locale.setter
-    def locale(self, newVal):
-        if newVal not in self.supportedLocales:
-            raise f"{newVal} locale is not supported."
-        self._locale = newVal
+def register_commands(dp: Dispatcher) -> None:
+    dp.message.register(cmd.start, Command(commands=['start']))
+    dp.message.register(cmd.cancel, Command(commands=['cancel']))
+    dp.message.register(cmd.cancel, Text(text=['Отмена'], ignore_case=True))
+    dp.message.register(cmd.send_messages, Command(commands=['send']))
+    dp.message.register(cmd.set_message, Command(commands=['setMessage']))
 
-    # Methods
-    def __init__(self) -> None:
-        # TODO - find better way to define props
-        # Data
-        self.supportedLocales = ("ru")
-        # self.resources: dict[str, Any]
 
-        # NOTE - Default locale is "ru"
-        # DEFECT - Get first locale from supported, no hard-code
-        self.locale = "ru"
-
-        # TODO - ugly
-        env = Env()
-        env.read_env()
-        self.token: str = env("BOT_TOKEN")
-
-        with open(f"../res/locales/{self.locale}.json", "r", encoding="utf8") as file:
-            self.resources = json.load(file)
-
-        # DB init
-        with sqlite3.connect(df.DB_PATH) as dbConnect:
-            cursor = dbConnect.cursor()
-            cursor.execute(df.DB_SCHEMA_MESSAGES)
+def register_processors(dp: Dispatcher) -> None:
+    dp.message.register(cmd.proc_message, StateFilter(BotStatesGroup.message))
+    dp.message.register(cmd.proc_reсipient, StateFilter(BotStatesGroup.recipient))

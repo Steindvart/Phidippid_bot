@@ -7,7 +7,7 @@ from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButt
 from aiogram.fsm.context import FSMContext
 
 # DEFECT - using global objects, not good
-from main import bot, botConfig
+from bot import bot, botConfig
 from states import BotStatesGroup
 import utils
 import default_val as df
