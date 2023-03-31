@@ -3,6 +3,11 @@ import json
 from aiogram.types import User, Message
 
 
+def get_locale_res(locale: str):
+    with open(f"../res/locales/{locale}.json", "r", encoding="utf8") as file:
+        return json.load(file)
+
+
 def get_all_info(botInfo: User, msg: Message) -> dict[str, object]:
     return {
         "bot": json.loads(botInfo.json()),

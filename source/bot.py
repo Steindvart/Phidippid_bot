@@ -1,10 +1,10 @@
-import json
 import sqlite3
 from dataclasses import dataclass
 
 from aiogram import Bot
 from environs import Env
 import default_val as df
+import utils
 
 
 @dataclass
@@ -29,9 +29,7 @@ class BotConfig:
         # NOTE - Default locale is "ru"
         # DEFECT - Get first locale from supported, no hard-code
         self.locale = "ru"
-
-        with open(f"../res/locales/{self.locale}.json", "r", encoding="utf8") as file:
-            self.resources = json.load(file)
+        self.resources = utils.get_locale_res(self.locale)
 
         # DB init
         with sqlite3.connect(df.DB_PATH) as dbConnect:
