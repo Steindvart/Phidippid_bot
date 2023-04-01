@@ -23,9 +23,8 @@ keyboard_cancel: ReplyKeyboardMarkup = ReplyKeyboardMarkup(resize_keyboard=True,
 async def start(message: types.Message) -> None:
     logging.info(utils.get_log_str("start", message.from_user))
 
-    await message.answer(res["start"])
-    allCommands = "\n".join(res["mainCommands"].values())
-    await message.answer(allCommands)
+    text = res["start"] + "\n\n" + "\n".join(res["mainCommands"].values())
+    await message.answer(text)
 
 
 async def cancel(message: types.Message, state: FSMContext) -> None:
@@ -36,6 +35,12 @@ async def cancel(message: types.Message, state: FSMContext) -> None:
 
     await state.clear()
     await message.answer(text='Состояние сброшено', reply_markup=ReplyKeyboardRemove())
+
+
+async def about(message: types.Message) -> None:
+    logging.info(utils.get_log_str("about", message.from_user))
+
+    await message.answer(res["about"])
 
 
 async def send_message_to_recipient(from_chat: types.message, recipient_id, text):
