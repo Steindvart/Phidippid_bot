@@ -3,28 +3,23 @@ import sqlite3
 import asyncio
 
 from aiogram import types, exceptions
-from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
 from aiogram.fsm.context import FSMContext
 
 # DEFECT - using global objects, not good
-from bot import bot, botConfig
+from bot import bot, bot_config, main_keyboard, cancel_keyboard
 from states import BotStatesGroup
 import utils
 import default_val as df
 
 # Alliaces
-res = botConfig.resources
-
-# Keyboards
-btn_cancel: KeyboardButton = KeyboardButton(text='Отмена')
-keyboard_cancel: ReplyKeyboardMarkup = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[btn_cancel]])
+res = bot_config.resources
 
 
 async def start(message: types.Message) -> None:
     logging.info(utils.get_log_str("start", message.from_user))
 
     text = res["start"] + "\n\n" + "\n".join(res["mainCommands"].values())
-    await message.answer(text)
+    await message.answer(text, reply_markup=main_keyboard)
 
 
 async def cancel(message: types.Message, state: FSMContext) -> None:
@@ -34,7 +29,7 @@ async def cancel(message: types.Message, state: FSMContext) -> None:
         return
 
     await state.clear()
-    await message.answer(text='Состояние сброшено', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text='Состояние сброшено', reply_markup=main_keyboard)
 
 
 async def about(message: types.Message) -> None:
@@ -48,7 +43,7 @@ async def send_message_to_recipient(from_chat: types.message, recipient_id, text
     link = types.User(id=recipient_id, first_name=str(recipient_id), is_bot=False).url
     try:
         await bot.send_message(chat_id=recipient_id, text=text)
-        await from_chat.answer(text=f'✅ Успех: сообщение отправлено получателю {link}.')
+        await from_chat.answer(text=f'✅ Успех: сообщение доставлено получателю {link}.')
     except exceptions.TelegramForbiddenError:
         await from_chat.answer(text=f'❌ Неудача: получатель {link} не активировал или заблокировал бота.')
     except exceptions.TelegramNotFound:
@@ -58,7 +53,7 @@ async def send_message_to_recipient(from_chat: types.message, recipient_id, text
         await asyncio.sleep(e.retry_after)
         await bot.send_message(chat_id=recipient_id, text=text)
     except exceptions.TelegramAPIError:
-        await from_chat.answer(text=f'❌ Неудача: сообщение для получателя {link} не доставлено.')
+        await from_chat.answer(text=f'❌ Неудача: сообщение получателю {link} не доставлено.')
 
 
 async def send_messages(message: types.Message, state: FSMContext) -> None:
@@ -76,7 +71,7 @@ async def set_message(message: types.Message, state: FSMContext) -> None:
     logging.info(utils.get_log_str("set_message", message.from_user))
 
     await state.set_state(BotStatesGroup.message)
-    await message.answer(text='Введите сообщение, которое вы хотите отправить.', reply_markup=keyboard_cancel)
+    await message.answer(text='Введите сообщение, которое вы хотите отправить.', reply_markup=cancel_keyboard)
 
 
 async def proc_message(message: types.Message, state: FSMContext) -> None:
@@ -85,7 +80,7 @@ async def proc_message(message: types.Message, state: FSMContext) -> None:
     await state.set_data({'text': message.text})
 
     await state.set_state(BotStatesGroup.recipient)
-    await message.answer(text='Введите user id получателя сообщения.', reply_markup=keyboard_cancel)
+    await message.answer(text='Введите user id получателя сообщения.', reply_markup=cancel_keyboard)
 
 
 async def proc_reсipient(message: types.Message, state: FSMContext) -> None:
@@ -106,4 +101,4 @@ async def proc_reсipient(message: types.Message, state: FSMContext) -> None:
         conn.commit()
 
     await state.clear()
-    await message.answer(text="✅ Сообщение добавлено", reply_markup=ReplyKeyboardRemove())
+    await message.answer(text="✅ Сообщение добавлено", reply_markup=main_keyboard)

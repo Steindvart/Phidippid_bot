@@ -2,6 +2,8 @@ import sqlite3
 from dataclasses import dataclass
 
 from aiogram import Bot
+from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
+
 from environs import Env
 import default_val as df
 import utils
@@ -38,10 +40,26 @@ class BotConfig:
 
 
 # Global obj
-botConfig: BotConfig = BotConfig()
+bot_config: BotConfig = BotConfig()
 
 # TODO - ugly
 env = Env()
 env.read_env()
 
 bot: Bot = Bot(env("BOT_TOKEN"), parse_mode="HTML")
+
+main_buttons = [
+    [
+        KeyboardButton(text="Отправить все сообщения")
+    ],
+]
+
+main_keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
+    keyboard=main_buttons,
+    resize_keyboard=True
+)
+
+cancel_keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Отмена")]],
+    resize_keyboard=True
+)
