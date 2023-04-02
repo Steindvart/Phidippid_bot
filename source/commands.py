@@ -44,19 +44,21 @@ async def about(message: types.Message) -> None:
 
 
 async def send_message_to_recipient(from_chat: types.message, recipient_id, text):
+    # TODO - make better link format, recipient.mention_html() - DON'T WORK!
+    link = types.User(id=recipient_id, first_name=str(recipient_id), is_bot=False).url
     try:
         await bot.send_message(chat_id=recipient_id, text=text)
-        await from_chat.answer(text=f'✅ Успех: сообщение отправлено получателю {recipient_id}.')
+        await from_chat.answer(text=f'✅ Успех: сообщение отправлено получателю {link}.')
     except exceptions.TelegramForbiddenError:
-        await from_chat.answer(text=f'❌ Неудача: получатель {recipient_id} не активировал или заблокировал бота.')
+        await from_chat.answer(text=f'❌ Неудача: получатель {link} не активировал или заблокировал бота.')
     except exceptions.TelegramNotFound:
-        await from_chat.answer(text=f'❌ Неудача: получатель {recipient_id} не существует.')
+        await from_chat.answer(text=f'❌ Неудача: получатель {link} не существует.')
     except exceptions.TelegramRetryAfter as e:
         # TODO - message about retry
         await asyncio.sleep(e.retry_after)
         await bot.send_message(chat_id=recipient_id, text=text)
     except exceptions.TelegramAPIError:
-        await from_chat.answer(text=f'❌ Неудача: сообщение для {recipient_id} не отправлено.')
+        await from_chat.answer(text=f'❌ Неудача: сообщение для получателя {link} не доставлено.')
 
 
 async def send_messages(message: types.Message, state: FSMContext) -> None:

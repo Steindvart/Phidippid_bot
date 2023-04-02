@@ -10,7 +10,7 @@ def register_commands(dp: Dispatcher) -> None:
     dp.message.register(cmd.cancel, Command(commands=['cancel']))
     dp.message.register(cmd.cancel, Text(text=['Отмена'], ignore_case=True))
     dp.message.register(cmd.send_messages, Command(commands=['send']))
-    dp.message.register(cmd.set_message, Command(commands=['setMessage']))
+    dp.message.register(cmd.set_message, Command(commands=['setMessage'], ignore_case=True))
     dp.message.register(cmd.about, Command(commands=['about']))
 
 
