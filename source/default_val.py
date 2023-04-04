@@ -1,6 +1,6 @@
 INDENT = 4
 TMP_PATH = "tmp/"
-DB_PATH = "data/main.db"
+DB_PATH = "source/data/main.db"
 
 # DB Schema
 DB_SCHEMA_MESSAGES = '''CREATE TABLE IF NOT EXISTS messages
