@@ -1,8 +1,8 @@
 ## Phiddipid - sending emergency messages with one button.
 
-*I deliver your emergency messages, whatever it takes!*
+> *I deliver your emergency messages, whatever it takes!*
 
-https://t.me/Phidippid_bot
+- https://t.me/Phidippid_bot
 
 **Phiddipid** Telegram bot - is a tool that allows you to quickly and easily send emergency messages to your chosen recipients. With just a few commands, you can create messages that can be sent at the touch of a button to selected recipients in an emergency situation, such as detention, medical emergency, natural disaster or other situation.
 
